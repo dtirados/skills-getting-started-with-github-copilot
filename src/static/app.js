@@ -16,31 +16,49 @@ document.addEventListener("DOMContentLoaded", () => {
         const activityCard = document.createElement("div");
         activityCard.className = "activity-card";
 
-        const spotsLeft = details.max_participants - details.participants.length;
         const participants = Array.isArray(details.participants) ? details.participants : [];
-        const participantList = participants.length
-          ? participants.map((email) => `
-              <li class="participant-item">
-                <span>${email}</span>
-                <button class="delete-btn" data-activity="${name}" data-email="${email}" type="button" aria-label="Remove ${email} from ${name}">
-                  🗑️
-                </button>
-              </li>
-            `).join("")
-          : "<li class=\"participant-empty\">No participants yet</li>";
+        const spotsLeft = details.max_participants - participants.length;
 
         activityCard.innerHTML = `
-          <h4>${name}</h4>
-          <p>${details.description}</p>
-          <p><strong>Schedule:</strong> ${details.schedule}</p>
-          <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <h4></h4>
+          <p class="activity-description"></p>
+          <p><strong>Schedule:</strong> <span class="activity-schedule"></span></p>
+          <p><strong>Availability:</strong> <span class="activity-spots"></span></p>
           <div class="participants-section">
             <strong>Participants:</strong>
-            <ul class="participants-list">
-              ${participantList}
-            </ul>
+            <ul class="participants-list"></ul>
           </div>
         `;
+
+        activityCard.querySelector("h4").textContent = name;
+        activityCard.querySelector(".activity-description").textContent = details.description;
+        activityCard.querySelector(".activity-schedule").textContent = details.schedule;
+        activityCard.querySelector(".activity-spots").textContent = `${spotsLeft} spots left`;
+
+        const ul = activityCard.querySelector(".participants-list");
+        if (participants.length === 0) {
+          const li = document.createElement("li");
+          li.className = "participant-empty";
+          li.textContent = "No participants yet";
+          ul.appendChild(li);
+        } else {
+          participants.forEach((email) => {
+            const li = document.createElement("li");
+            li.className = "participant-item";
+            const span = document.createElement("span");
+            span.textContent = email;
+            const btn = document.createElement("button");
+            btn.className = "delete-btn";
+            btn.type = "button";
+            btn.setAttribute("aria-label", `Remove ${email} from ${name}`);
+            btn.dataset.activity = name;
+            btn.dataset.email = email;
+            btn.textContent = "🗑️";
+            li.appendChild(span);
+            li.appendChild(btn);
+            ul.appendChild(li);
+          });
+        }
 
         activitiesList.appendChild(activityCard);
 
